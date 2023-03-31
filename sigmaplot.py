@@ -17,27 +17,28 @@ def func(parameters, *data):
 
 def cal(infile, s):
     s_df = pd.melt(infile, id_vars=['Ca'], value_vars=[f"{s}-1", f"{s}-2", f"{s}-3", f"{s}-4"], var_name='S', value_name=f'{s}')
-    bounds = [(-10, -1), (20, 40), (200, 600)]
+    bounds = [(-10, -1), (10, 100), (100, 1000)]
     x = s_df['Ca'].values
     y = s_df[f'{s}'].values
     args = (x, y)
 
     results = differential_evolution(func, bounds, args=args)
     print(f"{s} results:", results.x)
-    return results.x
+    return results.x, s
 
 
 def plot(infile, output_dir, filename):
     fig, ax = plt.subplots(figsize=(9.4,6))
     x = infile['Ca'].sort_values(ascending=True).values
-    s_values = ['S1', 'S2', 'S3', 'S4']
+    s_values = ['S1', 'S2', 'S3', 'S4'] if 'S4-1' in infile.columns else ['S1', 'S2', 'S3']
+    print(s_values)
     An_dict = {}
     color_list = ['#7f0000', '#006837', '#feb24c', '#253494']
-    for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'])):
+    for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'] if 'S4-1' in infile.columns else ['Ca vs 1-1 - 1-3 \n', 'Ca vs 2-1 - 2-3 \n', 'Ca vs 3-1 - 3-3 \n'])):
         An = []
-        y0 = cal(infile, s)[0]
-        a = cal(infile, s)[1]
-        b = cal(infile, s)[2]
+        y0 = cal(infile, s)[0][0]
+        a = cal(infile, s)[0][1]
+        b = cal(infile, s)[0][2]
         for j in range(len(x)):
             An.append((y0 + a * x[j] / (b + x[j])))
         An_dict[s] = An

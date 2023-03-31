@@ -33,7 +33,7 @@ def plot(infile, output_dir, filename):
     s_values = ['S1', 'S2', 'S3', 'S4']
     An_dict = {}
     color_list = ['#7f0000', '#006837', '#feb24c', '#253494']
-    for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 4-4 \n', 'Ca vs 4-1 - 4-4 \n'])):
+    for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'])):
         An = []
         y0 = cal(infile, s)[0]
         a = cal(infile, s)[1]

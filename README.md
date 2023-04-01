@@ -54,10 +54,10 @@ main 함수는 프로그램의 메인 함수입니다. 파일 입력 방식을 �
 
 ## 결과
 
-### SigmaPlot
+### SigmaPlot-Original
 ![image](https://user-images.githubusercontent.com/93086581/229191234-1ef96e2e-7e1f-470d-821c-4c89894f94d2.png)
 
 <br>
 
 ### SigmaPlot-Python
-![9월100동](https://user-images.githubusercontent.com/93086581/229272576-9a76ddd7-d3b2-4357-bf30-8985dd7e9c67.png)
+![9월100동](https://user-images.githubusercontent.com/93086581/229289954-5264a1db-46ba-45a1-a2a1-7eb72f9b1a95.png)

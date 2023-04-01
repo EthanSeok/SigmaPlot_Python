@@ -17,7 +17,7 @@ def func(parameters, *data):
 
 def cal(infile, s):
     s_df = pd.melt(infile, id_vars=['Ca'], value_vars=[f"{s}-1", f"{s}-2", f"{s}-3", f"{s}-4"], var_name='S', value_name=f'{s}')
-    bounds = [(-10, -1), (10, 100), (100, 1000)]
+    bounds = [(-10, -1), (10, 100), (200, 1000)]
     x = s_df['Ca'].values
     y = s_df[f'{s}'].values
     args = (x, y)
@@ -49,7 +49,7 @@ def plot(infile, output_dir, filename):
         y = grouped['S1_mean']
         yerr = grouped['S1_std']
         sns.lineplot(x, An, color=color_list[i], legend=False, linewidth=1.5, alpha=0.84)
-        ax.errorbar(x, y, yerr=yerr, label=f"{label}: {y0:.3f}+{a:.3f}x/({b:.4f}+x)", color=color_list[i], fmt='o', capsize=8)
+        ax.errorbar(x, y, yerr=yerr, label=f"{label}: {y0:.3f}+{a:.3f}x/({b:.4f}+x)", color=color_list[i], fmt='o', capsize=6, markersize=7.5)
 
     ax.set(ylim=(-10, 40))
     ax.set_ylabel('$A(μmol/m^2/s)$')

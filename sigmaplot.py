@@ -24,7 +24,7 @@ def cal(infile, s):
 
     results = differential_evolution(func, bounds, args=args)
     print(f"{s} results:", results.x)
-    return results, s
+    return results, s, s_df
 
 
 def plot(infile, output_dir, filename):
@@ -35,17 +35,21 @@ def plot(infile, output_dir, filename):
     color_list = ['#7f0000', '#006837', '#feb24c', '#253494']
     for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'] if 'S4-1' in infile.columns else ['Ca vs 1-1 - 1-3 \n', 'Ca vs 2-1 - 2-3 \n', 'Ca vs 3-1 - 3-3 \n'])):
         An = []
-        results, s = cal(infile, s)
+        results, s , s_df = cal(infile, s)
         y0 = results.x[0]
         a = results.x[1]
         b = results.x[2]
         for j in range(len(x)):
             An.append((y0 + a * x[j] / (b + x[j])))
         An_dict[s] = An
-        sns.lineplot(x, An, label=f"{label}: {y0:.3f}+{a:.3f}x/({b:.4f}+x)", marker='o', markersize=8,
-                     color=color_list[i])
-        # 에러바 추가
-        plt.errorbar(x, An, yerr=2, fmt='none', ecolor=color_list[i], capsize=3)
+        grouped = s_df.groupby('Ca').agg({s: ['mean', 'std']})
+        grouped.columns = ['S1_mean', 'S1_std']
+        grouped.reset_index(inplace=True)
+        x = grouped['Ca']
+        y = grouped['S1_mean']
+        yerr = grouped['S1_std']
+        sns.lineplot(x, An, color=color_list[i], legend=False, linewidth=1.5, alpha=0.84)
+        ax.errorbar(x, y, yerr=yerr, label=f"{label}: {y0:.3f}+{a:.3f}x/({b:.4f}+x)", color=color_list[i], fmt='o', capsize=8)
 
     ax.set(ylim=(-10, 40))
     ax.set_ylabel('$A(μmol/m^2/s)$')
@@ -53,7 +57,7 @@ def plot(infile, output_dir, filename):
     ax.set_xlabel('$Ca(μmol/mol)$')
     ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     fig.subplots_adjust(right=0.68)
-    fig.savefig(os.path.join(f'{output_dir}/{filename}.png'))
+    fig.savefig(os.path.join(f'{output_dir}/{filename}.png'), dpi=300)
 
 
 

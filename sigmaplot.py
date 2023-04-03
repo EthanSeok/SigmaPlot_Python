@@ -42,7 +42,7 @@ def plot(infile, output_dir, filename):
         for j in range(len(x)):
             An.append((y0 + a * x[j] / (b + x[j])))
         An_dict[s] = An
-        grouped = s_df.groupby('Ca').agg({s: ['mean', 'std']})
+        grouped = s_df.groupby('Ca').agg({s: ['mean', 'sem']})
         grouped.columns = ['S1_mean', 'S1_std']
         grouped.reset_index(inplace=True)
         x = grouped['Ca']

@@ -35,7 +35,7 @@ def plot(infile, output_dir, filename):
     An_dict = {}
     color_list = ['#7f0000', '#006837', '#feb24c', '#253494']
 
-    with tqdm(total=len(s_values), desc=f'{filename} 생성 완료', unit='image') as pbar:
+    with tqdm(total=len(s_values), desc=f'{filename}', unit='image') as pbar:
         for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'] if 'S4-1' in infile.columns else ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n'])):
             An = []
             results, s , s_df = cal(infile, s)
@@ -53,7 +53,7 @@ def plot(infile, output_dir, filename):
             yerr = grouped['S1_std']
             sns.lineplot(x=x, y=An, color=color_list[i], legend=False, linewidth=1.5, alpha=0.84)
             ax.errorbar(x=x, y=y, yerr=yerr, label=f"{label} {y0:.3f}+{a:.3f}*x/({b:.4f}+x)", color=color_list[i], fmt='o', capsize=6, markersize=7.5)
-            pbar.update(1)  # tqdm 업데이트
+            pbar.update(1)
     ax.set(ylim=(-10, 40))
     ax.set_ylabel('$A(μmol/m^2/s)$')
     ax.set(xlim=(-100, 1600))

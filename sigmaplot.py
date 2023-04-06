@@ -3,6 +3,7 @@ from scipy.optimize import differential_evolution
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from tqdm import tqdm
 
 
 def func(parameters, *data):
@@ -23,7 +24,7 @@ def cal(infile, s):
     args = (x, y)
 
     results = differential_evolution(func, bounds, args=args)
-    print(f"{s} results:", results.x)
+    # print(f"{s} results:", results.x)
     return results, s, s_df
 
 
@@ -33,24 +34,26 @@ def plot(infile, output_dir, filename):
     s_values = ['S1', 'S2', 'S3', 'S4'] if 'S4-1' in infile.columns else ['S1', 'S2', 'S3']
     An_dict = {}
     color_list = ['#7f0000', '#006837', '#feb24c', '#253494']
-    for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'] if 'S4-1' in infile.columns else ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n'])):
-        An = []
-        results, s , s_df = cal(infile, s)
-        y0 = results.x[0]
-        a = results.x[1]
-        b = results.x[2]
-        for j in range(len(x)):
-            An.append((y0 + a * x[j] / (b + x[j])))
-        An_dict[s] = An
-        grouped = s_df.groupby('Ca').agg({s: ['mean', 'sem']})
-        grouped.columns = ['S1_mean', 'S1_std']
-        grouped.reset_index(inplace=True)
-        x = grouped['Ca']
-        y = grouped['S1_mean']
-        yerr = grouped['S1_std']
-        sns.lineplot(x, An, color=color_list[i], legend=False, linewidth=1.5, alpha=0.84)
-        ax.errorbar(x, y, yerr=yerr, label=f"{label} {y0:.3f}+{a:.3f}*x/({b:.4f}+x)", color=color_list[i], fmt='o', capsize=6, markersize=7.5)
 
+    with tqdm(total=len(s_values), desc=f'{filename} 생성 완료', unit='image') as pbar:
+        for i, (s, label) in enumerate(zip(s_values, ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n', 'Ca vs 4-1 - 4-4 \n'] if 'S4-1' in infile.columns else ['Ca vs 1-1 - 1-4 \n', 'Ca vs 2-1 - 2-4 \n', 'Ca vs 3-1 - 3-4 \n'])):
+            An = []
+            results, s , s_df = cal(infile, s)
+            y0 = results.x[0]
+            a = results.x[1]
+            b = results.x[2]
+            for j in range(len(x)):
+                An.append((y0 + a * x[j] / (b + x[j])))
+            An_dict[s] = An
+            grouped = s_df.groupby('Ca').agg({s: ['mean', 'sem']})
+            grouped.columns = ['S1_mean', 'S1_std']
+            grouped.reset_index(inplace=True)
+            x = grouped['Ca']
+            y = grouped['S1_mean']
+            yerr = grouped['S1_std']
+            sns.lineplot(x=x, y=An, color=color_list[i], legend=False, linewidth=1.5, alpha=0.84)
+            ax.errorbar(x=x, y=y, yerr=yerr, label=f"{label} {y0:.3f}+{a:.3f}*x/({b:.4f}+x)", color=color_list[i], fmt='o', capsize=6, markersize=7.5)
+            pbar.update(1)  # tqdm 업데이트
     ax.set(ylim=(-10, 40))
     ax.set_ylabel('$A(μmol/m^2/s)$')
     ax.set(xlim=(-100, 1600))
@@ -58,7 +61,6 @@ def plot(infile, output_dir, filename):
     ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
     fig.subplots_adjust(right=0.68)
     fig.savefig(os.path.join(f'{output_dir}/{filename}.png'), dpi=300)
-
 
 
 def main():
